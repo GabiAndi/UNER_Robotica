@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>716</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>716</height>
+    <height>672</height>
    </size>
   </property>
   <property name="font">
@@ -368,6 +368,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="pushButtonABBBorrarUltimoPunto">
+             <property name="text">
+              <string>Borrar último</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="pushButtonABBLimpiarTrayectoria">
              <property name="text">
               <string>Limpiar</string>
@@ -412,29 +419,10 @@
              </property>
             </widget>
            </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBoxABBHerramienta">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="title">
-           <string>Herramienta</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_12">
            <item>
-            <widget class="QPushButton" name="pushButtonABBActivarHerramienta">
+            <widget class="QPushButton" name="pushButtonABBCargarTrayectoria">
              <property name="text">
-              <string>Activar</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButtonABBDesactivarHerramienta">
-             <property name="text">
-              <string>Desactivar</string>
+              <string>Cargar</string>
              </property>
             </widget>
            </item>
@@ -840,6 +828,32 @@
               </widget>
              </item>
             </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxABBHerramienta">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Herramienta</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <widget class="QPushButton" name="pushButtonABBActivarHerramienta">
+             <property name="text">
+              <string>Activar</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonABBDesactivarHerramienta">
+             <property name="text">
+              <string>Desactivar</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

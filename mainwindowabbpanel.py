@@ -7,6 +7,7 @@ import numpy as np
 import sim
 import time
 import os
+import csv
 
 from abbengine import ABBEngine
 
@@ -83,12 +84,18 @@ class MainWindowABBPanel(QMainWindow):
         self.ui.pushButtonABBCUp.clicked.connect(self.pushButton_pushButtonABBCUp_onClicked)
 
         self.ui.pushButtonABBCapturarPunto.clicked.connect(self.pushButton_pushButtonABBCapturarPunto_onClicked)
+        self.ui.pushButtonABBBorrarUltimoPunto.clicked.connect(
+            self.pushButton_pushButtonABBBorrarUltimoPunto_onClicked
+        )
         self.ui.pushButtonABBLimpiarTrayectoria.clicked.connect(
             self.pushButton_pushButtonABBLimpiarTrayectoria_onClicked
         )
         self.ui.pushButtonABBEjecutarPuntos.clicked.connect(self.pushButton_pushButtonABBEjecutarTrayectoria_onClicked)
         self.ui.pushButtonABBGuardarTrayectoria.clicked.connect(
             self.pushButton_pushButtonABBGuardarTrayectoria_onClicked
+        )
+        self.ui.pushButtonABBCargarTrayectoria.clicked.connect(
+            self.pushButton_pushButtonABBCargarTrayectoria_onClicked
         )
 
         self.ui.pushButtonABBActivarHerramienta.clicked.connect(
@@ -452,6 +459,12 @@ class MainWindowABBPanel(QMainWindow):
 
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
+    def pushButton_pushButtonABBBorrarUltimoPunto_onClicked(self):
+        if len(self.trajectory) > 0:
+            self.trajectory.pop()
+
+            self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
+
     def pushButton_pushButtonABBLimpiarTrayectoria_onClicked(self):
         self.trajectory.clear()
 
@@ -460,12 +473,8 @@ class MainWindowABBPanel(QMainWindow):
     def pushButton_pushButtonABBEjecutarTrayectoria_onClicked(self):
         if len(self.trajectory) > 0:
             traj_home = [
-                self.abbengine.linTrajectory(self.trajectory[len(self.trajectory) - 1][0],
-                                             self.trajectory[len(self.trajectory) - 1][1],
-                                             self.trajectory[len(self.trajectory) - 1][2],
-                                             self.trajectory[len(self.trajectory) - 1][3],
-                                             self.trajectory[len(self.trajectory) - 1][4],
-                                             self.trajectory[len(self.trajectory) - 1][5],
+                self.abbengine.linTrajectory(self.x, self.y, self.z,
+                                             self.a, self.b, self.c,
                                              self.p_home[0], self.p_home[1], self.p_home[2],
                                              self.p_home[3], self.p_home[4], self.p_home[5],
                                              100)
@@ -500,10 +509,15 @@ class MainWindowABBPanel(QMainWindow):
                                                          self.trajectory[i + 1][4], self.trajectory[i + 1][5],
                                                          100))
 
+                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[i + 1]
+
             for i in traj:
                 for j in i:
                     self.coppeliaSetJointsRotations(j[0], j[1], j[2], j[3], j[4], j[5])
                     time.sleep(0.01)
+
+            QMessageBox(QMessageBox.Information, "Trayectoria", "Ejecutada correctamente",
+                        QMessageBox.Ok, self).open()
 
         else:
             QMessageBox(QMessageBox.Warning, "Trayectoria", "No hay puntos para ejecutar",
@@ -513,13 +527,46 @@ class MainWindowABBPanel(QMainWindow):
         file_name = QFileDialog.getSaveFileName(self, "Guardar trayectoria", os.getcwd() + "/trajs",
                                                 "*.traj")
 
-        file = open(file_name[0] + ".txt", "w+")
+        file = open(file_name[0] + ".traj", "w")
 
         for i in range(0, len(self.trajectory)):
-            file.write("Punto %d\r\n" % (i + 1))
-            file.write("%s\r\n" % self.trajectory[i])
+            for j in range(0, 6):
+                file.write(str(self.trajectory[i][j]))
+                file.write(',')
+
+            file.write("\r\n")
 
         file.close()
+
+    def pushButton_pushButtonABBCargarTrayectoria_onClicked(self):
+        file_name = QFileDialog.getOpenFileName(self, "Cargar trayectoria", os.getcwd() + "/trajs",
+                                                "*.traj")
+
+        file = open(file_name[0], "r")
+
+        if file:
+            a = list(csv.reader(file, delimiter=','))
+
+            self.trajectory.clear()
+
+            for row in a:
+                _row = []
+
+                for i in range(0, 6):
+                    _row.append(float(row[i]))
+
+                self.trajectory.append(_row)
+
+            file.close()
+
+            self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
+
+            QMessageBox(QMessageBox.Information, "Trayectoria", "Se cargo correctamente",
+                        QMessageBox.Ok, self).show()
+
+        else:
+            QMessageBox(QMessageBox.Critical, "Trayectoria", "Error al cargar archivo",
+                        QMessageBox.Ok, self).show()
 
     def pushButton_pushButtonABBActivarHerramienta_onClicked(self):
         self.coppeliaSetVacuumGripper(1)

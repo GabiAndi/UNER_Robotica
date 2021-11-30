@@ -17,8 +17,8 @@ class Ui_MainWindowABBPanel(object):
     def setupUi(self, MainWindowABBPanel):
         if not MainWindowABBPanel.objectName():
             MainWindowABBPanel.setObjectName(u"MainWindowABBPanel")
-        MainWindowABBPanel.resize(600, 716)
-        MainWindowABBPanel.setMinimumSize(QSize(600, 716))
+        MainWindowABBPanel.resize(600, 672)
+        MainWindowABBPanel.setMinimumSize(QSize(600, 672))
         font = QFont()
         font.setFamily(u"Nimbus Sans")
         MainWindowABBPanel.setFont(font)
@@ -264,6 +264,11 @@ class Ui_MainWindowABBPanel(object):
 
         self.verticalLayout_10.addWidget(self.pushButtonABBCapturarPunto)
 
+        self.pushButtonABBBorrarUltimoPunto = QPushButton(self.groupBoxABBTrayectoria)
+        self.pushButtonABBBorrarUltimoPunto.setObjectName(u"pushButtonABBBorrarUltimoPunto")
+
+        self.verticalLayout_10.addWidget(self.pushButtonABBBorrarUltimoPunto)
+
         self.pushButtonABBLimpiarTrayectoria = QPushButton(self.groupBoxABBTrayectoria)
         self.pushButtonABBLimpiarTrayectoria.setObjectName(u"pushButtonABBLimpiarTrayectoria")
 
@@ -296,26 +301,13 @@ class Ui_MainWindowABBPanel(object):
 
         self.verticalLayout_10.addWidget(self.pushButtonABBGuardarTrayectoria)
 
+        self.pushButtonABBCargarTrayectoria = QPushButton(self.groupBoxABBTrayectoria)
+        self.pushButtonABBCargarTrayectoria.setObjectName(u"pushButtonABBCargarTrayectoria")
+
+        self.verticalLayout_10.addWidget(self.pushButtonABBCargarTrayectoria)
+
 
         self.verticalLayout_7.addWidget(self.groupBoxABBTrayectoria)
-
-        self.groupBoxABBHerramienta = QGroupBox(self.centralwidget)
-        self.groupBoxABBHerramienta.setObjectName(u"groupBoxABBHerramienta")
-        self.groupBoxABBHerramienta.setEnabled(False)
-        self.verticalLayout_12 = QVBoxLayout(self.groupBoxABBHerramienta)
-        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.pushButtonABBActivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
-        self.pushButtonABBActivarHerramienta.setObjectName(u"pushButtonABBActivarHerramienta")
-
-        self.verticalLayout_12.addWidget(self.pushButtonABBActivarHerramienta)
-
-        self.pushButtonABBDesactivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
-        self.pushButtonABBDesactivarHerramienta.setObjectName(u"pushButtonABBDesactivarHerramienta")
-
-        self.verticalLayout_12.addWidget(self.pushButtonABBDesactivarHerramienta)
-
-
-        self.verticalLayout_7.addWidget(self.groupBoxABBHerramienta)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -562,6 +554,24 @@ class Ui_MainWindowABBPanel(object):
 
         self.verticalLayout_14.addWidget(self.groupBoxABBJuntas)
 
+        self.groupBoxABBHerramienta = QGroupBox(self.centralwidget)
+        self.groupBoxABBHerramienta.setObjectName(u"groupBoxABBHerramienta")
+        self.groupBoxABBHerramienta.setEnabled(False)
+        self.verticalLayout_12 = QVBoxLayout(self.groupBoxABBHerramienta)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.pushButtonABBActivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
+        self.pushButtonABBActivarHerramienta.setObjectName(u"pushButtonABBActivarHerramienta")
+
+        self.verticalLayout_12.addWidget(self.pushButtonABBActivarHerramienta)
+
+        self.pushButtonABBDesactivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
+        self.pushButtonABBDesactivarHerramienta.setObjectName(u"pushButtonABBDesactivarHerramienta")
+
+        self.verticalLayout_12.addWidget(self.pushButtonABBDesactivarHerramienta)
+
+
+        self.verticalLayout_14.addWidget(self.groupBoxABBHerramienta)
+
         self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_14.addItem(self.verticalSpacer_6)
@@ -609,14 +619,13 @@ class Ui_MainWindowABBPanel(object):
         self.labelABBPasos.setText(QCoreApplication.translate("MainWindowABBPanel", u"10", None))
         self.groupBoxABBTrayectoria.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Trayectoria", None))
         self.pushButtonABBCapturarPunto.setText(QCoreApplication.translate("MainWindowABBPanel", u"Capturar", None))
+        self.pushButtonABBBorrarUltimoPunto.setText(QCoreApplication.translate("MainWindowABBPanel", u"Borrar \u00faltimo", None))
         self.pushButtonABBLimpiarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Limpiar", None))
         self.label_12.setText(QCoreApplication.translate("MainWindowABBPanel", u"Puntos:", None))
         self.labelABBCantidadPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"0", None))
         self.pushButtonABBEjecutarPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"Ejecutar", None))
         self.pushButtonABBGuardarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Guardar", None))
-        self.groupBoxABBHerramienta.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Herramienta", None))
-        self.pushButtonABBActivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Activar", None))
-        self.pushButtonABBDesactivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Desactivar", None))
+        self.pushButtonABBCargarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Cargar", None))
         self.groupBoxABBControl.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Control", None))
         self.label_10.setText(QCoreApplication.translate("MainWindowABBPanel", u"Posici\u00f3n", None))
         self.pushButtonABBYUp.setText(QCoreApplication.translate("MainWindowABBPanel", u"Y+", None))
@@ -681,5 +690,8 @@ class Ui_MainWindowABBPanel(object):
         self.labelABBQ5.setText(QCoreApplication.translate("MainWindowABBPanel", u"0.00", None))
         self.label_24.setText(QCoreApplication.translate("MainWindowABBPanel", u"Q6", None))
         self.labelABBQ6.setText(QCoreApplication.translate("MainWindowABBPanel", u"0.00", None))
+        self.groupBoxABBHerramienta.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Herramienta", None))
+        self.pushButtonABBActivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Activar", None))
+        self.pushButtonABBDesactivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Desactivar", None))
     # retranslateUi
 
