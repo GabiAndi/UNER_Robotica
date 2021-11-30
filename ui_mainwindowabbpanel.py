@@ -17,8 +17,8 @@ class Ui_MainWindowABBPanel(object):
     def setupUi(self, MainWindowABBPanel):
         if not MainWindowABBPanel.objectName():
             MainWindowABBPanel.setObjectName(u"MainWindowABBPanel")
-        MainWindowABBPanel.resize(821, 619)
-        MainWindowABBPanel.setMinimumSize(QSize(600, 460))
+        MainWindowABBPanel.resize(600, 716)
+        MainWindowABBPanel.setMinimumSize(QSize(600, 716))
         font = QFont()
         font.setFamily(u"Nimbus Sans")
         MainWindowABBPanel.setFont(font)
@@ -299,6 +299,24 @@ class Ui_MainWindowABBPanel(object):
 
         self.verticalLayout_7.addWidget(self.groupBoxABBTrayectoria)
 
+        self.groupBoxABBHerramienta = QGroupBox(self.centralwidget)
+        self.groupBoxABBHerramienta.setObjectName(u"groupBoxABBHerramienta")
+        self.groupBoxABBHerramienta.setEnabled(False)
+        self.verticalLayout_12 = QVBoxLayout(self.groupBoxABBHerramienta)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.pushButtonABBActivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
+        self.pushButtonABBActivarHerramienta.setObjectName(u"pushButtonABBActivarHerramienta")
+
+        self.verticalLayout_12.addWidget(self.pushButtonABBActivarHerramienta)
+
+        self.pushButtonABBDesactivarHerramienta = QPushButton(self.groupBoxABBHerramienta)
+        self.pushButtonABBDesactivarHerramienta.setObjectName(u"pushButtonABBDesactivarHerramienta")
+
+        self.verticalLayout_12.addWidget(self.pushButtonABBDesactivarHerramienta)
+
+
+        self.verticalLayout_7.addWidget(self.groupBoxABBHerramienta)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_7.addItem(self.verticalSpacer)
@@ -315,11 +333,11 @@ class Ui_MainWindowABBPanel(object):
         sizePolicy2.setHeightForWidth(self.groupBoxABBControl.sizePolicy().hasHeightForWidth())
         self.groupBoxABBControl.setSizePolicy(sizePolicy2)
         self.groupBoxABBControl.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-        self.horizontalLayout_18 = QHBoxLayout(self.groupBoxABBControl)
-        self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
+        self.horizontalLayout_17 = QHBoxLayout(self.groupBoxABBControl)
+        self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout_18.addItem(self.horizontalSpacer_3)
+        self.horizontalLayout_17.addItem(self.horizontalSpacer_3)
 
         self.verticalLayout_11 = QVBoxLayout()
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
@@ -424,11 +442,11 @@ class Ui_MainWindowABBPanel(object):
         self.verticalLayout_11.addItem(self.verticalSpacer_3)
 
 
-        self.horizontalLayout_18.addLayout(self.verticalLayout_11)
+        self.horizontalLayout_17.addLayout(self.verticalLayout_11)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout_18.addItem(self.horizontalSpacer_2)
+        self.horizontalLayout_17.addItem(self.horizontalSpacer_2)
 
 
         self.horizontalLayout_9.addWidget(self.groupBoxABBControl)
@@ -596,6 +614,9 @@ class Ui_MainWindowABBPanel(object):
         self.labelABBCantidadPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"0", None))
         self.pushButtonABBEjecutarPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"Ejecutar", None))
         self.pushButtonABBGuardarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Guardar", None))
+        self.groupBoxABBHerramienta.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Herramienta", None))
+        self.pushButtonABBActivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Activar", None))
+        self.pushButtonABBDesactivarHerramienta.setText(QCoreApplication.translate("MainWindowABBPanel", u"Desactivar", None))
         self.groupBoxABBControl.setTitle(QCoreApplication.translate("MainWindowABBPanel", u"Control", None))
         self.label_10.setText(QCoreApplication.translate("MainWindowABBPanel", u"Posici\u00f3n", None))
         self.pushButtonABBYUp.setText(QCoreApplication.translate("MainWindowABBPanel", u"Y+", None))

@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QFileDialog
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog, QLineEdit
 from PySide2.QtCore import Signal
 
 from ui_mainwindowabbpanel import Ui_MainWindowABBPanel
@@ -66,6 +66,7 @@ class MainWindowABBPanel(QMainWindow):
 
         # Eventos de botones
         self.ui.pushButtonCoppeliaIniciarDetener.clicked.connect(self.pushButton_coppeliaIniciarDetener_onClicked)
+        self.ui.pushButtonCoppeliaConfiguracion.clicked.connect(self.pushButton_coppeliaConfiguracion_onClicked)
 
         self.ui.pushButtonABBXDown.clicked.connect(self.pushButton_pushButtonABBXDown_onClicked)
         self.ui.pushButtonABBXUp.clicked.connect(self.pushButton_pushButtonABBXUp_onClicked)
@@ -86,7 +87,16 @@ class MainWindowABBPanel(QMainWindow):
             self.pushButton_pushButtonABBLimpiarTrayectoria_onClicked
         )
         self.ui.pushButtonABBEjecutarPuntos.clicked.connect(self.pushButton_pushButtonABBEjecutarTrayectoria_onClicked)
-        self.ui.pushButtonABBGuardarTrayectoria.clicked.connect(self.pushButton_pushButtonABBGuardarTrayectoria_onClicked)
+        self.ui.pushButtonABBGuardarTrayectoria.clicked.connect(
+            self.pushButton_pushButtonABBGuardarTrayectoria_onClicked
+        )
+
+        self.ui.pushButtonABBActivarHerramienta.clicked.connect(
+            self.pushButton_pushButtonABBActivarHerramienta_onClicked
+        )
+        self.ui.pushButtonABBDesactivarHerramienta.clicked.connect(
+            self.pushButton_pushButtonABBDesactivarHerramienta_onClicked
+        )
 
     def closeEvent(self, event):
         self.coppeliaDisconnect()
@@ -105,6 +115,7 @@ class MainWindowABBPanel(QMainWindow):
                     self.ui.pushButtonCoppeliaConfiguracion.setEnabled(False)
                     self.ui.groupBoxABBControl.setEnabled(True)
                     self.ui.groupBoxABBTrayectoria.setEnabled(True)
+                    self.ui.groupBoxABBHerramienta.setEnabled(True)
 
                 else:
                     QMessageBox(QMessageBox.Critical, "Simulación", "Error en la configuración",
@@ -127,6 +138,86 @@ class MainWindowABBPanel(QMainWindow):
             self.ui.pushButtonCoppeliaConfiguracion.setEnabled(True)
             self.ui.groupBoxABBControl.setEnabled(False)
             self.ui.groupBoxABBTrayectoria.setEnabled(False)
+            self.ui.groupBoxABBHerramienta.setEnabled(False)
+
+    def pushButton_coppeliaConfiguracion_onClicked(self):
+        # Junta 1
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 1:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint1Name)
+
+        if set_handle:
+            self.coppeliaJoint1Name = new_joint_handle
+
+        else:
+            return
+
+        # Junta 2
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 2:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint2Name)
+
+        if set_handle:
+            self.coppeliaJoint2Name = new_joint_handle
+
+        else:
+            return
+
+        # Junta 3
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 3:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint3Name)
+
+        if set_handle:
+            self.coppeliaJoint3Name = new_joint_handle
+
+        else:
+            return
+
+        # Junta 4
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 4:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint4Name)
+
+        if set_handle:
+            self.coppeliaJoint4Name = new_joint_handle
+
+        else:
+            return
+
+        # Junta 5
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 5:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint5Name)
+
+        if set_handle:
+            self.coppeliaJoint5Name = new_joint_handle
+
+        else:
+            return
+
+        # Junta 6
+        [new_joint_handle, set_handle] = QInputDialog.getText(self,
+                                                              "Nombre de los joints",
+                                                              "Junta 6:",
+                                                              QLineEdit.Normal,
+                                                              self.coppeliaJoint6Name)
+
+        if set_handle:
+            self.coppeliaJoint6Name = new_joint_handle
+
+        else:
+            return
 
     def pushButton_pushButtonABBXDown_onClicked(self):
         _x = self.x - self.ui.horizontalSliderABBPasos.value()
@@ -429,6 +520,15 @@ class MainWindowABBPanel(QMainWindow):
             file.write("%s\r\n" % self.trajectory[i])
 
         file.close()
+
+    def pushButton_pushButtonABBActivarHerramienta_onClicked(self):
+        self.coppeliaSetVacuumGripper(1)
+
+    def pushButton_pushButtonABBDesactivarHerramienta_onClicked(self):
+        self.coppeliaSetVacuumGripper(0)
+
+    def coppeliaSetVacuumGripper(self, active):
+        sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripper_active", active, sim.simx_opmode_oneshot)
 
     def valueChanged(self):
         self.ui.labelABBPosicionX.setText(str("%.2f" % self.x))
