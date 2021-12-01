@@ -8,6 +8,7 @@ from abbengine import ABBEngine
 import sim
 import numpy as np
 import time
+import csv
 
 
 class MainWindowTrabajoFinal(QMainWindow):
@@ -20,8 +21,11 @@ class MainWindowTrabajoFinal(QMainWindow):
         self.ui = Ui_MainWindowTrabajoFinal()
         self.ui.setupUi(self)
 
+        # Bandera que detiene la ejecucion
+        self.programInterrupt = False
+
         # Posiciones de interes
-        self.p_home = [374.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores iniciales
         self.coppeliaIdClient = -1
@@ -59,10 +63,21 @@ class MainWindowTrabajoFinal(QMainWindow):
         self.coppeliaABB1Joint6Handle = None
 
         # Vector de trayectorias
+        self.abb1Trajectory = []
         self.abb1Instructions = []
 
         # Motor de cinematica
-        self.abb2Engine = ABBEngine()
+        self.abb1Engine = ABBEngine()
+
+        # Herramienta
+        self.abb1Engine.tool = np.array(
+            [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 67.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ]
+        )
 
         # Brazo 2
         # Valores actuales del robot
@@ -97,15 +112,29 @@ class MainWindowTrabajoFinal(QMainWindow):
         self.coppeliaABB2Joint6Handle = None
 
         # Vector de trayectorias
+        self.abb2Trajectory = []
         self.abb2Instructions = []
 
         # Motor de cinematica
         self.abb2Engine = ABBEngine()
 
+        # Herramienta
+        self.abb2Engine.tool = np.array(
+            [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 67.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ]
+        )
+
         # Eventos de botones
         self.ui.pushButtonIniciar.clicked.connect(self.pushButtonIniciar_onCliked)
+        self.ui.pushButtonDetener.clicked.connect(self.pushButtonDetener_onCliked)
 
     def closeEvent(self, event):
+        self.stop()
+
         self.coppeliaDisconnect()
 
         self.closed.emit()
@@ -126,27 +155,50 @@ class MainWindowTrabajoFinal(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Escena", "Error de conexión",
                         QMessageBox.Ok, self).exec_()
 
+    def pushButtonDetener_onCliked(self):
+        self.stop()
+
     def start(self):
-        # Establecemos todas las instrucciones
-        self.abb1Instructions.append()
+        # Establecemos las trayectorias
+        # Brazo 1
+        if not self.abb1LoadTrajectory():
+            return
+
+        self.abb1Instructions.append(
+            self.abb1ExecLinTrajectory(self.p_home[0], self.p_home[1], self.p_home[2],
+                                       self.p_home[3], self.p_home[4], self.p_home[5])
+        )
+
+        for i in range(0, len(self.abb1Trajectory)):
+            self.abb1Instructions.append(
+                self.abb1ExecLinTrajectory(self.abb1Trajectory[i][0], self.abb1Trajectory[i][1],
+                                           self.abb1Trajectory[i][2], self.abb1Trajectory[i][3],
+                                           self.abb1Trajectory[i][4], self.abb1Trajectory[i][5])
+            )
+
+        for i in self.abb1Instructions:
+            i()
+
+    def stop(self):
+        pass
 
     def abb1ExecTrajectory(self, traj):
         for i in traj:
-            self.coppeliaSetJointsRotations(i[0], i[1], i[2], i[3], i[4], i[5])
+            self.coppeliaABB1SetJointsRotations(i[0], i[1], i[2], i[3], i[4], i[5])
             self.abb1_q1, self.abb1_q2, self.abb1_q3, self.abb1_q4, self.abb1_q5, self.abb1_q6 = \
                 i[0], i[1], i[2], i[3], i[4], i[5]
             time.sleep(0.01)
 
     def abb1ExecPtpTrajectory(self, x, y, z, a, b, c):
-        traj = self.abbengine.ptpTrajectory(self.abb1_x, self.abb1_y, self.abb1_z,
-                                            self.abb1_a, self.abb1_b, self.abb1_c,
-                                            x, y, z, a, b, c,
-                                            100)
+        traj = self.abb1Engine.ptpTrajectory(self.abb1_x, self.abb1_y, self.abb1_z,
+                                             self.abb1_a, self.abb1_b, self.abb1_c,
+                                             x, y, z, a, b, c,
+                                             100)
 
         if traj:
-            self.execTrajectory(traj)
+            self.abb1ExecTrajectory(traj)
             self.abb1_x, self.abb1_y, self.abb1_z, self.abb1_a, self.abb1_b, self.abb1_c = x, y, z, a, b, c
-            self.valueChanged()
+            #self.valueChanged()
 
             return True
 
@@ -154,15 +206,38 @@ class MainWindowTrabajoFinal(QMainWindow):
             return False
 
     def abb1ExecLinTrajectory(self, x, y, z, a, b, c):
-        traj = self.abbengine.linTrajectory(self.abb1_x, self.abb1_y, self.abb1_z,
-                                            self.abb1_a, self.abb1_b, self.abb1_c,
-                                            x, y, z, a, b, c,
-                                            100)
+        traj = self.abb1Engine.linTrajectory(self.abb1_x, self.abb1_y, self.abb1_z,
+                                             self.abb1_a, self.abb1_b, self.abb1_c,
+                                             x, y, z, a, b, c,
+                                             100)
 
         if traj:
-            self.execTrajectory(traj)
+            self.abb1ExecTrajectory(traj)
             self.abb1_x, self.abb1_y, self.abb1_z, self.abb1_a, self.abb1_b, self.abb1_c = x, y, z, a, b, c
-            self.valueChanged()
+            #self.valueChanged()
+
+            return True
+
+        else:
+            return False
+
+    def abb1LoadTrajectory(self):
+        file = open("trajs/ABB1.traj", "r")
+
+        if file:
+            a = list(csv.reader(file, delimiter=','))
+
+            self.abb1Trajectory.clear()
+
+            for row in a:
+                _row = []
+
+                for i in range(0, 6):
+                    _row.append(float(row[i]))
+
+                self.abb1Trajectory.append(_row)
+
+            file.close()
 
             return True
 

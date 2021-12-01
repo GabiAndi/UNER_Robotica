@@ -36,7 +36,7 @@ class MainWindowABBPanel(QMainWindow):
         )
 
         # Posiciones de interes
-        self.p_home = [374.0 + self.abbengine.tool[2, 3], 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores actuales del robot
         self.q1 = 0.0
