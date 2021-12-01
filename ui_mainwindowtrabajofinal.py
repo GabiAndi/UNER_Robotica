@@ -63,32 +63,6 @@ class Ui_MainWindowTrabajoFinal(object):
 
         self.horizontalLayout_3.addLayout(self.verticalLayout_4)
 
-        self.verticalLayout_5 = QVBoxLayout()
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_7 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_5.addItem(self.verticalSpacer_7)
-
-        self.label_7 = QLabel(self.groupBoxAcciones)
-        self.label_7.setObjectName(u"label_7")
-        self.label_7.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_5.addWidget(self.label_7)
-
-        self.progressBarTotal = QProgressBar(self.groupBoxAcciones)
-        self.progressBarTotal.setObjectName(u"progressBarTotal")
-        self.progressBarTotal.setMinimumSize(QSize(256, 0))
-        self.progressBarTotal.setValue(0)
-
-        self.verticalLayout_5.addWidget(self.progressBarTotal)
-
-        self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_5.addItem(self.verticalSpacer_8)
-
-
-        self.horizontalLayout_3.addLayout(self.verticalLayout_5)
-
         self.horizontalSpacer_6 = QSpacerItem(800, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_6)
@@ -286,7 +260,6 @@ class Ui_MainWindowTrabajoFinal(object):
         self.groupBoxAcciones.setTitle(QCoreApplication.translate("MainWindowTrabajoFinal", u"Acciones", None))
         self.pushButtonIniciar.setText(QCoreApplication.translate("MainWindowTrabajoFinal", u"Iniciar", None))
         self.pushButtonDetener.setText(QCoreApplication.translate("MainWindowTrabajoFinal", u"Detener", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindowTrabajoFinal", u"Progreso total", None))
         self.groupBoxVisualizacion.setTitle(QCoreApplication.translate("MainWindowTrabajoFinal", u"Visualizaci\u00f3n", None))
         self.groupBoxABB1.setTitle(QCoreApplication.translate("MainWindowTrabajoFinal", u"ABB 1", None))
         self.label_2.setText(QCoreApplication.translate("MainWindowTrabajoFinal", u"Acci\u00f3n", None))
