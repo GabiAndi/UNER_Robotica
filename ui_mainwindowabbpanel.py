@@ -17,8 +17,8 @@ class Ui_MainWindowABBPanel(object):
     def setupUi(self, MainWindowABBPanel):
         if not MainWindowABBPanel.objectName():
             MainWindowABBPanel.setObjectName(u"MainWindowABBPanel")
-        MainWindowABBPanel.resize(600, 672)
-        MainWindowABBPanel.setMinimumSize(QSize(600, 672))
+        MainWindowABBPanel.resize(600, 732)
+        MainWindowABBPanel.setMinimumSize(QSize(600, 732))
         font = QFont()
         font.setFamily(u"Nimbus Sans")
         MainWindowABBPanel.setFont(font)
@@ -290,6 +290,16 @@ class Ui_MainWindowABBPanel(object):
 
 
         self.verticalLayout_10.addLayout(self.horizontalLayout_19)
+
+        self.pushButtonABBAnteriorTrayectoria = QPushButton(self.groupBoxABBTrayectoria)
+        self.pushButtonABBAnteriorTrayectoria.setObjectName(u"pushButtonABBAnteriorTrayectoria")
+
+        self.verticalLayout_10.addWidget(self.pushButtonABBAnteriorTrayectoria)
+
+        self.pushButtonABBSiguienteTrayectoria = QPushButton(self.groupBoxABBTrayectoria)
+        self.pushButtonABBSiguienteTrayectoria.setObjectName(u"pushButtonABBSiguienteTrayectoria")
+
+        self.verticalLayout_10.addWidget(self.pushButtonABBSiguienteTrayectoria)
 
         self.pushButtonABBEjecutarPuntos = QPushButton(self.groupBoxABBTrayectoria)
         self.pushButtonABBEjecutarPuntos.setObjectName(u"pushButtonABBEjecutarPuntos")
@@ -623,6 +633,8 @@ class Ui_MainWindowABBPanel(object):
         self.pushButtonABBLimpiarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Limpiar", None))
         self.label_12.setText(QCoreApplication.translate("MainWindowABBPanel", u"Puntos:", None))
         self.labelABBCantidadPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"0", None))
+        self.pushButtonABBAnteriorTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Anterior", None))
+        self.pushButtonABBSiguienteTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Siguiente", None))
         self.pushButtonABBEjecutarPuntos.setText(QCoreApplication.translate("MainWindowABBPanel", u"Ejecutar", None))
         self.pushButtonABBGuardarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Guardar", None))
         self.pushButtonABBCargarTrayectoria.setText(QCoreApplication.translate("MainWindowABBPanel", u"Cargar", None))

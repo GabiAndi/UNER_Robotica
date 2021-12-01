@@ -25,8 +25,18 @@ class MainWindowABBPanel(QMainWindow):
         # Motor de cinematica
         self.abbengine = ABBEngine()
 
+        # Herramienta
+        self.abbengine.tool = np.array(
+            [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 67.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ]
+        )
+
         # Posiciones de interes
-        self.p_home = [374.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.p_home = [374.0 + self.abbengine.tool[2, 3], 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores actuales del robot
         self.q1 = 0.0
@@ -64,53 +74,45 @@ class MainWindowABBPanel(QMainWindow):
 
         # Vector de trayectorias
         self.trajectory = []
+        self.trajectoryIndex = 0
 
         # Eventos de botones
-        self.ui.pushButtonCoppeliaIniciarDetener.clicked.connect(self.pushButton_coppeliaIniciarDetener_onClicked)
-        self.ui.pushButtonCoppeliaConfiguracion.clicked.connect(self.pushButton_coppeliaConfiguracion_onClicked)
+        self.ui.pushButtonCoppeliaIniciarDetener.clicked.connect(self.pushButtonCoppeliaIniciarDetener_onClicked)
+        self.ui.pushButtonCoppeliaConfiguracion.clicked.connect(self.pushButtonCoppeliaConfiguracion_onClicked)
 
-        self.ui.pushButtonABBXDown.clicked.connect(self.pushButton_pushButtonABBXDown_onClicked)
-        self.ui.pushButtonABBXUp.clicked.connect(self.pushButton_pushButtonABBXUp_onClicked)
-        self.ui.pushButtonABBYDown.clicked.connect(self.pushButton_pushButtonABBYDown_onClicked)
-        self.ui.pushButtonABBYUp.clicked.connect(self.pushButton_pushButtonABBYUp_onClicked)
-        self.ui.pushButtonABBZDown.clicked.connect(self.pushButton_pushButtonABBZDown_onClicked)
-        self.ui.pushButtonABBZUp.clicked.connect(self.pushButton_pushButtonABBZUp_onClicked)
+        self.ui.pushButtonABBXDown.clicked.connect(self.pushButtonABBXDown_onClicked)
+        self.ui.pushButtonABBXUp.clicked.connect(self.pushButtonABBXUp_onClicked)
+        self.ui.pushButtonABBYDown.clicked.connect(self.pushButtonABBYDown_onClicked)
+        self.ui.pushButtonABBYUp.clicked.connect(self.pushButtonABBYUp_onClicked)
+        self.ui.pushButtonABBZDown.clicked.connect(self.pushButtonABBZDown_onClicked)
+        self.ui.pushButtonABBZUp.clicked.connect(self.pushButtonABBZUp_onClicked)
 
-        self.ui.pushButtonABBADown.clicked.connect(self.pushButton_pushButtonABBADown_onClicked)
-        self.ui.pushButtonABBAUp.clicked.connect(self.pushButton_pushButtonABBAUp_onClicked)
-        self.ui.pushButtonABBBDown.clicked.connect(self.pushButton_pushButtonABBBDown_onClicked)
-        self.ui.pushButtonABBBUp.clicked.connect(self.pushButton_pushButtonABBBUp_onClicked)
-        self.ui.pushButtonABBCDown.clicked.connect(self.pushButton_pushButtonABBCDown_onClicked)
-        self.ui.pushButtonABBCUp.clicked.connect(self.pushButton_pushButtonABBCUp_onClicked)
+        self.ui.pushButtonABBADown.clicked.connect(self.pushButtonABBADown_onClicked)
+        self.ui.pushButtonABBAUp.clicked.connect(self.pushButtonABBAUp_onClicked)
+        self.ui.pushButtonABBBDown.clicked.connect(self.pushButtonABBBDown_onClicked)
+        self.ui.pushButtonABBBUp.clicked.connect(self.pushButtonABBBUp_onClicked)
+        self.ui.pushButtonABBCDown.clicked.connect(self.pushButtonABBCDown_onClicked)
+        self.ui.pushButtonABBCUp.clicked.connect(self.pushButtonABBCUp_onClicked)
 
-        self.ui.pushButtonABBCapturarPunto.clicked.connect(self.pushButton_pushButtonABBCapturarPunto_onClicked)
-        self.ui.pushButtonABBBorrarUltimoPunto.clicked.connect(
-            self.pushButton_pushButtonABBBorrarUltimoPunto_onClicked
-        )
-        self.ui.pushButtonABBLimpiarTrayectoria.clicked.connect(
-            self.pushButton_pushButtonABBLimpiarTrayectoria_onClicked
-        )
-        self.ui.pushButtonABBEjecutarPuntos.clicked.connect(self.pushButton_pushButtonABBEjecutarTrayectoria_onClicked)
-        self.ui.pushButtonABBGuardarTrayectoria.clicked.connect(
-            self.pushButton_pushButtonABBGuardarTrayectoria_onClicked
-        )
-        self.ui.pushButtonABBCargarTrayectoria.clicked.connect(
-            self.pushButton_pushButtonABBCargarTrayectoria_onClicked
-        )
+        self.ui.pushButtonABBCapturarPunto.clicked.connect(self.pushButtonABBCapturarPunto_onClicked)
+        self.ui.pushButtonABBBorrarUltimoPunto.clicked.connect(self.pushButtonABBBorrarUltimoPunto_onClicked)
+        self.ui.pushButtonABBLimpiarTrayectoria.clicked.connect(self.pushButtonABBLimpiarTrayectoria_onClicked)
 
-        self.ui.pushButtonABBActivarHerramienta.clicked.connect(
-            self.pushButton_pushButtonABBActivarHerramienta_onClicked
-        )
-        self.ui.pushButtonABBDesactivarHerramienta.clicked.connect(
-            self.pushButton_pushButtonABBDesactivarHerramienta_onClicked
-        )
+        self.ui.pushButtonABBSiguienteTrayectoria.clicked.connect(self.pushButtonABBSiguienteTrayectoria_onClicked)
+        self.ui.pushButtonABBAnteriorTrayectoria.clicked.connect(self.pushButtonABBAnteriorTrayectoria_onClicked)
+        self.ui.pushButtonABBEjecutarPuntos.clicked.connect(self.pushButtonABBEjecutarTrayectoria_onClicked)
+        self.ui.pushButtonABBGuardarTrayectoria.clicked.connect(self.pushButtonABBGuardarTrayectoria_onClicked)
+        self.ui.pushButtonABBCargarTrayectoria.clicked.connect(self.pushButtonABBCargarTrayectoria_onClicked)
+
+        self.ui.pushButtonABBActivarHerramienta.clicked.connect(self.pushButtonABBActivarHerramienta_onClicked)
+        self.ui.pushButtonABBDesactivarHerramienta.clicked.connect(self.pushButtonABBDesactivarHerramienta_onClicked)
 
     def closeEvent(self, event):
         self.coppeliaDisconnect()
 
         self.closed.emit()
 
-    def pushButton_coppeliaIniciarDetener_onClicked(self):
+    def pushButtonCoppeliaIniciarDetener_onClicked(self):
         if not self.coppeliaIsConnected():
             if self.coppeliaConnect(self.ui.lineEditCoppeliaIP.text(), int(self.ui.lineEditCoppeliaPuerto.text())):
                 if self.coppeliaBegin():
@@ -147,7 +149,7 @@ class MainWindowABBPanel(QMainWindow):
             self.ui.groupBoxABBTrayectoria.setEnabled(False)
             self.ui.groupBoxABBHerramienta.setEnabled(False)
 
-    def pushButton_coppeliaConfiguracion_onClicked(self):
+    def pushButtonCoppeliaConfiguracion_onClicked(self):
         # Junta 1
         [new_joint_handle, set_handle] = QInputDialog.getText(self,
                                                               "Nombre de los joints",
@@ -226,7 +228,7 @@ class MainWindowABBPanel(QMainWindow):
         else:
             return
 
-    def pushButton_pushButtonABBXDown_onClicked(self):
+    def pushButtonABBXDown_onClicked(self):
         _x = self.x - self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(_x, self.y, self.z, self.a, self.b, self.c)
@@ -244,7 +246,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBXUp_onClicked(self):
+    def pushButtonABBXUp_onClicked(self):
         _x = self.x + self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(_x, self.y, self.z, self.a, self.b, self.c)
@@ -262,7 +264,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBYDown_onClicked(self):
+    def pushButtonABBYDown_onClicked(self):
         _y = self.y - self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(self.x, _y, self.z, self.a, self.b, self.c)
@@ -280,7 +282,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBYUp_onClicked(self):
+    def pushButtonABBYUp_onClicked(self):
         _y = self.y + self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(self.x, _y, self.z, self.a, self.b, self.c)
@@ -298,7 +300,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBZDown_onClicked(self):
+    def pushButtonABBZDown_onClicked(self):
         _z = self.z - self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(self.x, self.y, _z, self.a, self.b, self.c)
@@ -316,7 +318,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBZUp_onClicked(self):
+    def pushButtonABBZUp_onClicked(self):
         _z = self.z + self.ui.horizontalSliderABBPasos.value()
 
         sol = self.abbengine.inverseKinematic(self.x, self.y, _z, self.a, self.b, self.c)
@@ -334,7 +336,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBADown_onClicked(self):
+    def pushButtonABBADown_onClicked(self):
         _a = self.a - np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         if _a < (-np.pi * 2.0):
@@ -355,7 +357,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBAUp_onClicked(self):
+    def pushButtonABBAUp_onClicked(self):
         _a = self.a + np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         if _a > (np.pi * 2.0):
@@ -376,7 +378,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBBDown_onClicked(self):
+    def pushButtonABBBDown_onClicked(self):
         _b = self.b - np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         if _b < (-np.pi * 2.0):
@@ -397,7 +399,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBBUp_onClicked(self):
+    def pushButtonABBBUp_onClicked(self):
         _b = self.b + np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         if _b > (np.pi * 2.0):
@@ -418,7 +420,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBCDown_onClicked(self):
+    def pushButtonABBCDown_onClicked(self):
         _c = self.c - np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         sol = self.abbengine.inverseKinematic(self.x, self.y, self.z, self.a, self.b, _c)
@@ -436,7 +438,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBCUp_onClicked(self):
+    def pushButtonABBCUp_onClicked(self):
         _c = self.c + np.deg2rad(self.ui.horizontalSliderABBPasos.value())
 
         sol = self.abbengine.inverseKinematic(self.x, self.y, self.z, self.a, self.b, _c)
@@ -454,41 +456,61 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Cinemática", "Error de cinemática",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBCapturarPunto_onClicked(self):
+    def pushButtonABBCapturarPunto_onClicked(self):
         self.trajectory.append([self.x, self.y, self.z, self.a, self.b, self.c])
 
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
-    def pushButton_pushButtonABBBorrarUltimoPunto_onClicked(self):
+    def pushButtonABBBorrarUltimoPunto_onClicked(self):
         if len(self.trajectory) > 0:
             self.trajectory.pop()
 
             self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
-    def pushButton_pushButtonABBLimpiarTrayectoria_onClicked(self):
+    def pushButtonABBLimpiarTrayectoria_onClicked(self):
         self.trajectory.clear()
 
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
-    def pushButton_pushButtonABBEjecutarTrayectoria_onClicked(self):
-        if len(self.trajectory) > 0:
-            traj_home = [
-                self.abbengine.linTrajectory(self.x, self.y, self.z,
-                                             self.a, self.b, self.c,
-                                             self.p_home[0], self.p_home[1], self.p_home[2],
-                                             self.p_home[3], self.p_home[4], self.p_home[5],
-                                             100)
-            ]
+    def pushButtonABBAnteriorTrayectoria_onClicked(self):
+        if self.trajectoryIndex - 1 >= 0:
+            self.trajectoryIndex -= 1
 
-            for i in traj_home:
-                for j in i:
-                    self.coppeliaSetJointsRotations(j[0], j[1], j[2], j[3], j[4], j[5])
-                    time.sleep(0.01)
+            self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
+                                   self.trajectory[self.trajectoryIndex][1],
+                                   self.trajectory[self.trajectoryIndex][2],
+                                   self.trajectory[self.trajectoryIndex][3],
+                                   self.trajectory[self.trajectoryIndex][4],
+                                   self.trajectory[self.trajectoryIndex][5])
+
+            [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
+
+            self.valueChanged()
+
+    def pushButtonABBSiguienteTrayectoria_onClicked(self):
+        if self.trajectoryIndex + 1 < len(self.trajectory):
+            self.trajectoryIndex += 1
+
+            self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
+                                   self.trajectory[self.trajectoryIndex][1],
+                                   self.trajectory[self.trajectoryIndex][2],
+                                   self.trajectory[self.trajectoryIndex][3],
+                                   self.trajectory[self.trajectoryIndex][4],
+                                   self.trajectory[self.trajectoryIndex][5])
+
+            [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
+
+            self.valueChanged()
+
+    def pushButtonABBEjecutarTrayectoria_onClicked(self):
+        if len(self.trajectory) > 0:
+            self.execLinTrajectory(self.p_home[0], self.p_home[1], self.p_home[2],
+                                   self.p_home[3], self.p_home[4], self.p_home[5])
 
             QMessageBox(QMessageBox.Warning, "Trayectoria", "COI alcanzado",
                         QMessageBox.Ok, self).exec_()
 
-            traj = [
+            trajs = [
                 self.abbengine.linTrajectory(self.p_home[0], self.p_home[1], self.p_home[2],
                                              self.p_home[3], self.p_home[4], self.p_home[5],
                                              self.trajectory[0][0],
@@ -501,20 +523,19 @@ class MainWindowABBPanel(QMainWindow):
             ]
 
             for i in range(0, len(self.trajectory) - 1):
-                traj.append(self.abbengine.linTrajectory(self.trajectory[i][0], self.trajectory[i][1],
-                                                         self.trajectory[i][2], self.trajectory[i][3],
-                                                         self.trajectory[i][4], self.trajectory[i][5],
-                                                         self.trajectory[i + 1][0], self.trajectory[i + 1][1],
-                                                         self.trajectory[i + 1][2], self.trajectory[i + 1][3],
-                                                         self.trajectory[i + 1][4], self.trajectory[i + 1][5],
-                                                         100))
+                trajs.append(self.abbengine.linTrajectory(self.trajectory[i][0], self.trajectory[i][1],
+                                                          self.trajectory[i][2], self.trajectory[i][3],
+                                                          self.trajectory[i][4], self.trajectory[i][5],
+                                                          self.trajectory[i + 1][0], self.trajectory[i + 1][1],
+                                                          self.trajectory[i + 1][2], self.trajectory[i + 1][3],
+                                                          self.trajectory[i + 1][4], self.trajectory[i + 1][5],
+                                                          100))
 
-                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[i + 1]
+            for i in trajs:
+                self.execTrajectory(i)
 
-            for i in traj:
-                for j in i:
-                    self.coppeliaSetJointsRotations(j[0], j[1], j[2], j[3], j[4], j[5])
-                    time.sleep(0.01)
+                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[len(self.trajectory) - 1]
+                self.valueChanged()
 
             QMessageBox(QMessageBox.Information, "Trayectoria", "Ejecutada correctamente",
                         QMessageBox.Ok, self).open()
@@ -523,7 +544,7 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Warning, "Trayectoria", "No hay puntos para ejecutar",
                         QMessageBox.Ok, self).open()
 
-    def pushButton_pushButtonABBGuardarTrayectoria_onClicked(self):
+    def pushButtonABBGuardarTrayectoria_onClicked(self):
         file_name = QFileDialog.getSaveFileName(self, "Guardar trayectoria", os.getcwd() + "/trajs",
                                                 "*.traj")
 
@@ -538,7 +559,7 @@ class MainWindowABBPanel(QMainWindow):
 
         file.close()
 
-    def pushButton_pushButtonABBCargarTrayectoria_onClicked(self):
+    def pushButtonABBCargarTrayectoria_onClicked(self):
         file_name = QFileDialog.getOpenFileName(self, "Cargar trayectoria", os.getcwd() + "/trajs",
                                                 "*.traj")
 
@@ -548,6 +569,7 @@ class MainWindowABBPanel(QMainWindow):
             a = list(csv.reader(file, delimiter=','))
 
             self.trajectory.clear()
+            self.trajectoryIndex = 0
 
             for row in a:
                 _row = []
@@ -568,14 +590,49 @@ class MainWindowABBPanel(QMainWindow):
             QMessageBox(QMessageBox.Critical, "Trayectoria", "Error al cargar archivo",
                         QMessageBox.Ok, self).show()
 
-    def pushButton_pushButtonABBActivarHerramienta_onClicked(self):
+    def pushButtonABBActivarHerramienta_onClicked(self):
         self.coppeliaSetVacuumGripper(1)
 
-    def pushButton_pushButtonABBDesactivarHerramienta_onClicked(self):
+    def pushButtonABBDesactivarHerramienta_onClicked(self):
         self.coppeliaSetVacuumGripper(0)
 
-    def coppeliaSetVacuumGripper(self, active):
-        sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripper_active", active, sim.simx_opmode_oneshot)
+    def execTrajectory(self, traj):
+        for i in traj:
+            self.coppeliaSetJointsRotations(i[0], i[1], i[2], i[3], i[4], i[5])
+            self.q1, self.q2, self.q3, self.q4, self.q5, self.q6 = i[0], i[1], i[2], i[3], i[4], i[5]
+            time.sleep(0.01)
+
+    def execPtpTrajectory(self, x, y, z, a, b, c):
+        traj = self.abbengine.ptpTrajectory(self.x, self.y, self.z,
+                                            self.a, self.b, self.c,
+                                            x, y, z, a, b, c,
+                                            100)
+
+        if traj:
+            self.execTrajectory(traj)
+            self.x, self.y, self.z, self.a, self.b, self.c = x, y, z, a, b, c
+            self.valueChanged()
+
+            return True
+
+        else:
+            return False
+
+    def execLinTrajectory(self, x, y, z, a, b, c):
+        traj = self.abbengine.linTrajectory(self.x, self.y, self.z,
+                                            self.a, self.b, self.c,
+                                            x, y, z, a, b, c,
+                                            100)
+
+        if traj:
+            self.execTrajectory(traj)
+            self.x, self.y, self.z, self.a, self.b, self.c = x, y, z, a, b, c
+            self.valueChanged()
+
+            return True
+
+        else:
+            return False
 
     def valueChanged(self):
         self.ui.labelABBPosicionX.setText(str("%.2f" % self.x))
@@ -643,3 +700,6 @@ class MainWindowABBPanel(QMainWindow):
                                  q5, sim.simx_opmode_oneshot)
         sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaJoint6Handle,
                                  q6, sim.simx_opmode_oneshot)
+
+    def coppeliaSetVacuumGripper(self, active):
+        sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripper_active", active, sim.simx_opmode_oneshot)

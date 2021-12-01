@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>672</height>
+    <height>732</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>672</height>
+    <height>732</height>
    </size>
   </property>
   <property name="font">
@@ -404,6 +404,20 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonABBAnteriorTrayectoria">
+             <property name="text">
+              <string>Anterior</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonABBSiguienteTrayectoria">
+             <property name="text">
+              <string>Siguiente</string>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="pushButtonABBEjecutarPuntos">
