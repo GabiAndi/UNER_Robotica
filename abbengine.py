@@ -201,15 +201,8 @@ class ABBEngine:
         q1 = np.arctan2(py, px)
 
         # No se puede rotar la junta
-        if q1 < np.deg2rad(-165.0):
-            q1 += np.pi
-
-            r = -r
-
-        elif q1 > np.deg2rad(165.0):
-            q1 -= np.pi
-
-            r = -r
+        if (q1 < np.deg2rad(-165.0)) or (q1 > np.deg2rad(165.0)):
+            return None
 
         # Cálculo de la junta 2
         zq2 = pz - 290.0

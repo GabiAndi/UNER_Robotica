@@ -36,7 +36,7 @@ class MainWindowABBPanel(QMainWindow):
         )
 
         # Posiciones de interes
-        self.p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.p_home = [200.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores actuales del robot
         self.q1 = 0.0
@@ -58,12 +58,12 @@ class MainWindowABBPanel(QMainWindow):
         self.coppeliaIdClient = -1
 
         # Juntas
-        self.coppeliaJoint1Name = "IRB120_joint_1"
-        self.coppeliaJoint2Name = "IRB120_joint_2"
-        self.coppeliaJoint3Name = "IRB120_joint_3"
-        self.coppeliaJoint4Name = "IRB120_joint_4"
-        self.coppeliaJoint5Name = "IRB120_joint_5"
-        self.coppeliaJoint6Name = "IRB120_joint_6"
+        self.coppeliaJoint1Name = "IRB120_joint_1_2"
+        self.coppeliaJoint2Name = "IRB120_joint_2_2"
+        self.coppeliaJoint3Name = "IRB120_joint_3_2"
+        self.coppeliaJoint4Name = "IRB120_joint_4_2"
+        self.coppeliaJoint5Name = "IRB120_joint_5_2"
+        self.coppeliaJoint6Name = "IRB120_joint_6_2"
 
         self.coppeliaJoint1Handle = None
         self.coppeliaJoint2Handle = None
@@ -459,6 +459,8 @@ class MainWindowABBPanel(QMainWindow):
     def pushButtonABBCapturarPunto_onClicked(self):
         self.trajectory.append([self.x, self.y, self.z, self.a, self.b, self.c])
 
+        self.trajectoryIndex = len(self.trajectory)
+
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
     def pushButtonABBBorrarUltimoPunto_onClicked(self):
@@ -476,31 +478,37 @@ class MainWindowABBPanel(QMainWindow):
         if self.trajectoryIndex - 1 >= 0:
             self.trajectoryIndex -= 1
 
-            self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
-                                   self.trajectory[self.trajectoryIndex][1],
-                                   self.trajectory[self.trajectoryIndex][2],
-                                   self.trajectory[self.trajectoryIndex][3],
-                                   self.trajectory[self.trajectoryIndex][4],
-                                   self.trajectory[self.trajectoryIndex][5])
+            if self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
+                                      self.trajectory[self.trajectoryIndex][1],
+                                      self.trajectory[self.trajectoryIndex][2],
+                                      self.trajectory[self.trajectoryIndex][3],
+                                      self.trajectory[self.trajectoryIndex][4],
+                                      self.trajectory[self.trajectoryIndex][5]):
+                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
 
-            [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
+                self.valueChanged()
 
-            self.valueChanged()
+            else:
+                QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
+                            QMessageBox.Ok, self).open()
 
     def pushButtonABBSiguienteTrayectoria_onClicked(self):
         if self.trajectoryIndex + 1 < len(self.trajectory):
             self.trajectoryIndex += 1
 
-            self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
-                                   self.trajectory[self.trajectoryIndex][1],
-                                   self.trajectory[self.trajectoryIndex][2],
-                                   self.trajectory[self.trajectoryIndex][3],
-                                   self.trajectory[self.trajectoryIndex][4],
-                                   self.trajectory[self.trajectoryIndex][5])
+            if self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
+                                      self.trajectory[self.trajectoryIndex][1],
+                                      self.trajectory[self.trajectoryIndex][2],
+                                      self.trajectory[self.trajectoryIndex][3],
+                                      self.trajectory[self.trajectoryIndex][4],
+                                      self.trajectory[self.trajectoryIndex][5]):
+                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
 
-            [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[self.trajectoryIndex]
+                self.valueChanged()
 
-            self.valueChanged()
+            else:
+                QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
+                            QMessageBox.Ok, self).open()
 
     def pushButtonABBEjecutarTrayectoria_onClicked(self):
         if len(self.trajectory) > 0:
@@ -532,10 +540,13 @@ class MainWindowABBPanel(QMainWindow):
                                                           100))
 
             for i in trajs:
-                self.execTrajectory(i)
+                if self.execTrajectory(i):
+                    [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[len(self.trajectory) - 1]
+                    self.valueChanged()
 
-                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[len(self.trajectory) - 1]
-                self.valueChanged()
+                else:
+                    QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
+                                QMessageBox.Ok, self).open()
 
             QMessageBox(QMessageBox.Information, "Trayectoria", "Ejecutada correctamente",
                         QMessageBox.Ok, self).open()
@@ -702,4 +713,4 @@ class MainWindowABBPanel(QMainWindow):
                                  q6, sim.simx_opmode_oneshot)
 
     def coppeliaSetVacuumGripper(self, active):
-        sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripper_active", active, sim.simx_opmode_oneshot)
+        sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripperB_active", active, sim.simx_opmode_oneshot)

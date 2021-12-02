@@ -45,6 +45,9 @@ class MainWindowTrabajoFinal(QMainWindow):
         self.scene.sceneError.connect(self.sceneError)
         self.scene.sceneStoped.connect(self.sceneStop)
 
+        self.scene.sceneCarObsSensorChanged.connect(self.sceneCarObsSensorChanged)
+        self.scene.sceneCarSensorChanged.connect(self.sceneCarSensorChanged)
+
     def closeEvent(self, event):
         self.sceneStop.emit()
 
@@ -76,12 +79,35 @@ class MainWindowTrabajoFinal(QMainWindow):
         QMessageBox(QMessageBox.Warning, "Escena", "La escena se detuvo correctamente",
                     QMessageBox.Ok, self).exec_()
 
+    def sceneCarSensorChanged(self, values):
+        self.ui.labelCarSensor0.setText(str("%.4f" % values[0]))
+        self.ui.labelCarSensor1.setText(str("%.4f" % values[1]))
+        self.ui.labelCarSensor2.setText(str("%.4f" % values[2]))
+        self.ui.labelCarSensor3.setText(str("%.4f" % values[3]))
+        self.ui.labelCarSensor4.setText(str("%.4f" % values[4]))
+        self.ui.labelCarSensor5.setText(str("%.4f" % values[5]))
+
+    def sceneCarObsSensorChanged(self, values):
+        self.ui.labelCarObsSensor1.setText(str("%.4f" % values[0]))
+        self.ui.labelCarObsSensor8.setText(str("%.4f" % values[7]))
+        self.ui.labelCarObsSensor9.setText(str("%.4f" % values[8]))
+        self.ui.labelCarObsSensor10.setText(str("%.4f" % values[9]))
+        self.ui.labelCarObsSensor11.setText(str("%.4f" % values[10]))
+        self.ui.labelCarObsSensor12.setText(str("%.4f" % values[11]))
+        self.ui.labelCarObsSensor13.setText(str("%.4f" % values[12]))
+        self.ui.labelCarObsSensor14.setText(str("%.4f" % values[13]))
+        self.ui.labelCarObsSensor15.setText(str("%.4f" % values[14]))
+        self.ui.labelCarObsSensor16.setText(str("%.4f" % values[15]))
+
 
 class TrabajoFinal(QObject):
     # Señales
     sceneStarted = Signal()
     sceneError = Signal(int)
     sceneStoped = Signal()
+
+    sceneCarObsSensorChanged = Signal(list)
+    sceneCarSensorChanged = Signal(list)
 
     def __init__(self, parent=None):
         super(TrabajoFinal, self).__init__(parent)
@@ -90,7 +116,8 @@ class TrabajoFinal(QObject):
         self.programInterrupt = False
 
         # Posiciones de interes
-        self.p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.abb1_p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.abb2_p_home = [200.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores iniciales
         self.coppeliaIdClient = -1
@@ -104,28 +131,16 @@ class TrabajoFinal(QObject):
         self.abb1_q5 = 0.0
         self.abb1_q6 = 0.0
 
-        self.abb1_x = self.p_home[0]
-        self.abb1_y = self.p_home[1]
-        self.abb1_z = self.p_home[2]
+        self.abb1_x = self.abb1_p_home[0]
+        self.abb1_y = self.abb1_p_home[1]
+        self.abb1_z = self.abb1_p_home[2]
 
-        self.abb1_a = self.p_home[3]
-        self.abb1_b = self.p_home[4]
-        self.abb1_c = self.p_home[5]
+        self.abb1_a = self.abb1_p_home[3]
+        self.abb1_b = self.abb1_p_home[4]
+        self.abb1_c = self.abb1_p_home[5]
 
         # Juntas
-        self.coppeliaABB1Joint1Name = "IRB120_joint_1"
-        self.coppeliaABB1Joint2Name = "IRB120_joint_2"
-        self.coppeliaABB1Joint3Name = "IRB120_joint_3"
-        self.coppeliaABB1Joint4Name = "IRB120_joint_4"
-        self.coppeliaABB1Joint5Name = "IRB120_joint_5"
-        self.coppeliaABB1Joint6Name = "IRB120_joint_6"
-
-        self.coppeliaABB1Joint1Handle = None
-        self.coppeliaABB1Joint2Handle = None
-        self.coppeliaABB1Joint3Handle = None
-        self.coppeliaABB1Joint4Handle = None
-        self.coppeliaABB1Joint5Handle = None
-        self.coppeliaABB1Joint6Handle = None
+        self.coppeliaABB1JointHandle = [None, None, None, None, None, None]
 
         # Vector de trayectorias
         self.abb1Trajectory = []
@@ -152,28 +167,16 @@ class TrabajoFinal(QObject):
         self.abb2_q5 = 0.0
         self.abb2_q6 = 0.0
 
-        self.abb2_x = self.p_home[0]
-        self.abb2_y = self.p_home[1]
-        self.abb2_z = self.p_home[2]
+        self.abb2_x = self.abb1_p_home[0]
+        self.abb2_y = self.abb1_p_home[1]
+        self.abb2_z = self.abb1_p_home[2]
 
-        self.abb2_a = self.p_home[3]
-        self.abb2_b = self.p_home[4]
-        self.abb2_c = self.p_home[5]
+        self.abb2_a = self.abb1_p_home[3]
+        self.abb2_b = self.abb1_p_home[4]
+        self.abb2_c = self.abb1_p_home[5]
 
         # Juntas
-        self.coppeliaABB2Joint1Name = "IRB120_joint_1_2"
-        self.coppeliaABB2Joint2Name = "IRB120_joint_2_2"
-        self.coppeliaABB2Joint3Name = "IRB120_joint_3_2"
-        self.coppeliaABB2Joint4Name = "IRB120_joint_4_2"
-        self.coppeliaABB2Joint5Name = "IRB120_joint_5_2"
-        self.coppeliaABB2Joint6Name = "IRB120_joint_6_2"
-
-        self.coppeliaABB2Joint1Handle = None
-        self.coppeliaABB2Joint2Handle = None
-        self.coppeliaABB2Joint3Handle = None
-        self.coppeliaABB2Joint4Handle = None
-        self.coppeliaABB2Joint5Handle = None
-        self.coppeliaABB2Joint6Handle = None
+        self.coppeliaABB2JointHandle = [None, None, None, None, None, None]
 
         # Vector de trayectorias
         self.abb2Trajectory = []
@@ -203,7 +206,10 @@ class TrabajoFinal(QObject):
 
         # Sensores
         self.carSensor = [None, None, None, None, None, None, None, None]
-        self.carSensorValue = []
+        self.carObsSensor = []
+
+        for i in range(0, 16):
+            self.carObsSensor.append(None)
 
     def start(self):
         if self.coppeliaConnect("127.0.0.1", 19999):
@@ -226,11 +232,11 @@ class TrabajoFinal(QObject):
     def exec(self):
         # Establecemos las trayectorias
         # Brazo 1
-        """if not self.abb1LoadTrajectory():
+        if not self.abb1LoadTrajectory():
             return
 
-        self.abb1ExecLinTrajectory(self.p_home[0], self.p_home[1], self.p_home[2],
-                                   self.p_home[3], self.p_home[4], self.p_home[5])
+        self.abb1ExecLinTrajectory(self.abb1_p_home[0], self.abb1_p_home[1], self.abb1_p_home[2],
+                                   self.abb1_p_home[3], self.abb1_p_home[4], self.abb1_p_home[5])
 
         for i in range(0, len(self.abb1Trajectory)):
             self.abb1ExecLinTrajectory(self.abb1Trajectory[i][0], self.abb1Trajectory[i][1],
@@ -241,20 +247,68 @@ class TrabajoFinal(QObject):
                 self.coppeliaABB1SetVacuumGripper(1)
 
             if (i == 6) or (i == 14) or (i == 22):
-                self.coppeliaABB1SetVacuumGripper(0)"""
+                self.coppeliaABB1SetVacuumGripper(0)
 
         # Autito
         car_complete = False
 
+        # Ponderacion
+        pond = [2.0, 1.0, 0.5, 0.3, 0.3, 0.5, 1.0, 2.0]
+
+        kp = 2.5
+        kd = 2.5
+
+        error_prev = 0.0
+
         while not car_complete:
-            # Leemos el valor de los sensores
-            self.carSensorValue = self.carReadSensors()
+            # Leemos los valores del ultrasonico
+            obstruction = False
 
-            if self.carSensorValue:
-                # Aca tengo que analizar el valor de los sensores
-                # self.carSensorValue
+            car_obs_sensor_value = self.carReadObsSensors()
 
-                time.sleep(1)
+            if car_obs_sensor_value:
+                self.sceneCarObsSensorChanged.emit(car_obs_sensor_value)
+
+            for i in range(10, 16):
+                if car_obs_sensor_value[i] < 0.1:
+                    obstruction = True
+
+            if obstruction:
+                self.carSetVelocity(0.0, 0.0)
+
+                """direction = 0.0
+
+                obs_pond = [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+
+                for i in range(10, 16):
+                    direction += 0.0"""
+
+            else:
+                # Leemos el valor de los sensores
+                car_sensor_value = self.carReadSensors()
+
+                if car_sensor_value:
+                    self.sceneCarSensorChanged.emit(car_sensor_value)
+
+                if car_sensor_value:
+                    # PID
+                    error = 0.0
+
+                    error += car_sensor_value[0] * pond[0] - car_sensor_value[7] * pond[7]
+                    error += car_sensor_value[1] * pond[1] - car_sensor_value[6] * pond[6]
+                    error += car_sensor_value[2] * pond[2] - car_sensor_value[5] * pond[5]
+                    error += car_sensor_value[3] * pond[3] - car_sensor_value[4] * pond[4]
+
+                    error /= 8
+
+                    correction = error * kp + error_prev * kd
+
+                    self.carSetVelocity(-0.5, -correction)
+
+                    # Valores del PID
+                    error_prev = error
+
+            time.sleep(0.1)
 
     def abb1ExecTrajectory(self, traj):
         for i in traj:
@@ -326,20 +380,40 @@ class TrabajoFinal(QObject):
                                                             sim.simx_opmode_streaming)
 
             if value:
-                values.append(value[0][0])
+                _val = np.mean(value[0])
+
+                values.append(_val)
 
             else:
                 return []
 
         return values
 
-    def carSensorMeansValue(self, sensors):
-        means = []
+    def carReadObsSensors(self):
+        values = []
 
-        for i in sensors:
-            means.append(np.mean(i))
+        # Valores de los sensores
+        for i in range(0, 16):
+            ret = sim.simxReadProximitySensor(
+                self.coppeliaIdClient, self.carObsSensor[i], sim.simx_opmode_oneshot
+            )
 
-        return means
+            if ret:
+                val = np.sqrt(np.power(ret[2][0], 2) + np.power(ret[2][1], 2) + np.power(ret[2][2], 2))
+
+                if val > 1.0:
+                    val = 1.0
+
+                values.append(val)
+
+        return values
+
+    def carSetVelocity(self, vel, omega):
+        # Obtenemos la velocidad de cada rueda para las velocidades
+        omega_left = (vel - self.carWheelsAxisDistanceL * omega) / self.carWheelsRadius
+        omega_right = (vel + self.carWheelsAxisDistanceL * omega) / self.carWheelsRadius
+
+        self.coppeliaCarSetWheelsVelocity(omega_left, omega_right)
 
     def coppeliaConnect(self, ip, port):
         # Cerramos todas las conexiones
@@ -358,119 +432,86 @@ class TrabajoFinal(QObject):
 
     def coppeliaBegin(self):
         # Para el brazo 1
-        ret_code_abb1_joint1, self.coppeliaABB1Joint1Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint1Name, sim.simx_opmode_blocking)
+        for i in range(0, 6):
+            ret_code, self.coppeliaABB1JointHandle[i] = sim.simxGetObjectHandle(
+                self.coppeliaIdClient, "IRB120_joint_" + str(i + 1), sim.simx_opmode_blocking
+            )
 
-        ret_code_abb1_joint2, self.coppeliaABB1Joint2Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint2Name, sim.simx_opmode_blocking)
-
-        ret_code_abb1_joint3, self.coppeliaABB1Joint3Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint3Name, sim.simx_opmode_blocking)
-
-        ret_code_abb1_joint4, self.coppeliaABB1Joint4Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint4Name, sim.simx_opmode_blocking)
-
-        ret_code_abb1_joint5, self.coppeliaABB1Joint5Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint5Name, sim.simx_opmode_blocking)
-
-        ret_code_abb1_joint6, self.coppeliaABB1Joint6Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB1Joint6Name, sim.simx_opmode_blocking)
+            if ret_code != sim.simx_return_ok:
+                return False
 
         # Para el brazo 2
-        ret_code_abb2_joint1, self.coppeliaABB2Joint1Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint1Name, sim.simx_opmode_blocking)
+        for i in range(0, 6):
+            ret_code, self.coppeliaABB2JointHandle[i] = sim.simxGetObjectHandle(
+                self.coppeliaIdClient, "IRB120_joint_" + str(i + 1) + "_2", sim.simx_opmode_blocking
+            )
 
-        ret_code_abb2_joint2, self.coppeliaABB2Joint2Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint2Name, sim.simx_opmode_blocking)
-
-        ret_code_abb2_joint3, self.coppeliaABB2Joint3Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint3Name, sim.simx_opmode_blocking)
-
-        ret_code_abb2_joint4, self.coppeliaABB2Joint4Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint4Name, sim.simx_opmode_blocking)
-
-        ret_code_abb2_joint5, self.coppeliaABB2Joint5Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint5Name, sim.simx_opmode_blocking)
-
-        ret_code_abb2_joint6, self.coppeliaABB2Joint6Handle = \
-            sim.simxGetObjectHandle(self.coppeliaIdClient, self.coppeliaABB2Joint6Name, sim.simx_opmode_blocking)
+            if ret_code != sim.simx_return_ok:
+                return False
 
         # Handles del autito
-        ret_code_car_left_joint, self.carLeftJoint = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                             "Pioneer_p3dx_leftMotor",
-                                                                             sim.simx_opmode_blocking)
+        ret_code, self.carLeftJoint = sim.simxGetObjectHandle(self.coppeliaIdClient,
+                                                              "Pioneer_p3dx_leftMotor",
+                                                              sim.simx_opmode_blocking)
 
-        ret_code_car_right_joint, self.carRigthJoint = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                               "Pioneer_p3dx_rightMotor",
-                                                                               sim.simx_opmode_blocking)
+        if ret_code != sim.simx_return_ok:
+            return False
 
-        # Handles de los sensores
-        ret_code_car_sensor0, self.carSensor[0] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor0",
-                                                                          sim.simx_opmode_blocking)
+        ret_code, self.carRigthJoint = sim.simxGetObjectHandle(self.coppeliaIdClient,
+                                                               "Pioneer_p3dx_rightMotor",
+                                                               sim.simx_opmode_blocking)
 
-        ret_code_car_sensor1, self.carSensor[1] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor1",
-                                                                          sim.simx_opmode_blocking)
+        if ret_code != sim.simx_return_ok:
+            return False
 
-        ret_code_car_sensor2, self.carSensor[2] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor2",
-                                                                          sim.simx_opmode_blocking)
+        # Handles de los sensores de linea
+        for i in range(0, 8):
+            ret_code, self.carSensor[i] = sim.simxGetObjectHandle(self.coppeliaIdClient,
+                                                                  "Sensor" + str(i),
+                                                                  sim.simx_opmode_blocking)
 
-        ret_code_car_sensor3, self.carSensor[3] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor3",
-                                                                          sim.simx_opmode_blocking)
+            if ret_code != sim.simx_return_ok:
+                return False
 
-        ret_code_car_sensor4, self.carSensor[4] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor4",
-                                                                          sim.simx_opmode_blocking)
+        # Handles de los sensores de parede
+        for i in range(0, 16):
+            ret_code, self.carObsSensor[i] = sim.simxGetObjectHandle(
+                self.coppeliaIdClient,
+                "Pioneer_p3dx_ultrasonicSensor" + str(i + 1),
+                sim.simx_opmode_blocking
+            )
 
-        ret_code_car_sensor5, self.carSensor[5] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor5",
-                                                                          sim.simx_opmode_blocking)
+            if ret_code != sim.simx_return_ok:
+                return False
 
-        ret_code_car_sensor6, self.carSensor[6] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor6",
-                                                                          sim.simx_opmode_blocking)
-
-        ret_code_car_sensor7, self.carSensor[7] = sim.simxGetObjectHandle(self.coppeliaIdClient,
-                                                                          "Sensor7",
-                                                                          sim.simx_opmode_blocking)
-
-        return (ret_code_abb1_joint1 or ret_code_abb1_joint2 or ret_code_abb1_joint3 or
-                ret_code_abb1_joint4 or ret_code_abb1_joint5 or ret_code_abb1_joint6 or
-                ret_code_abb2_joint1 or ret_code_abb2_joint2 or ret_code_abb2_joint3 or
-                ret_code_abb2_joint4 or ret_code_abb2_joint5 or ret_code_abb2_joint6 or
-                ret_code_car_sensor0 or ret_code_car_sensor1 or ret_code_car_sensor2 or
-                ret_code_car_sensor3 or ret_code_car_sensor4 or ret_code_car_sensor5 or
-                ret_code_car_sensor6 or ret_code_car_sensor7) == sim.simx_return_ok
+        return True
 
     def coppeliaABB1SetJointsRotations(self, q1, q2, q3, q4, q5, q6):
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint1Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[0],
                                  q1, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint2Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[1],
                                  q2, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint3Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[2],
                                  q3, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint4Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[3],
                                  q4, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint5Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[4],
                                  q5, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1Joint6Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB1JointHandle[5],
                                  q6, sim.simx_opmode_oneshot)
 
     def coppeliaABB2SetJointsRotations(self, q1, q2, q3, q4, q5, q6):
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint1Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[0],
                                  q1, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint2Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[1],
                                  q2, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint3Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[2],
                                  q3, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint4Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[3],
                                  q4, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint5Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[4],
                                  q5, sim.simx_opmode_oneshot)
-        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2Joint6Handle,
+        sim.simxSetJointPosition(self.coppeliaIdClient, self.coppeliaABB2JointHandle[5],
                                  q6, sim.simx_opmode_oneshot)
 
     def coppeliaABB1SetVacuumGripper(self, active):
@@ -478,3 +519,9 @@ class TrabajoFinal(QObject):
 
     def coppeliaABB2SetVacuumGripper(self, active):
         sim.simxSetInt32Signal(self.coppeliaIdClient, "VacuumGripperB_active", active, sim.simx_opmode_oneshot)
+
+    def coppeliaCarSetWheelsVelocity(self, wheel_left, wheel_right):
+        sim.simxSetJointTargetVelocity(self.coppeliaIdClient, self.carLeftJoint, wheel_left,
+                                       sim.simx_opmode_oneshot)
+        sim.simxSetJointTargetVelocity(self.coppeliaIdClient, self.carRigthJoint, wheel_right,
+                                       sim.simx_opmode_oneshot)
