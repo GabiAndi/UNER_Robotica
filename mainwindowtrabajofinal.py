@@ -117,7 +117,7 @@ class TrabajoFinal(QObject):
 
         # Posiciones de interes
         self.abb1_p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
-        self.abb1_p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.abb2_p_home = [200.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores iniciales
         self.coppeliaIdClient = -1
@@ -235,9 +235,18 @@ class TrabajoFinal(QObject):
         if not self.abb1LoadTrajectory():
             return
 
+        # Brazo 2
+        if not self.abb2LoadTrajectory():
+            return
+
+        # Movimientos al home
         self.abb1ExecLinTrajectory(self.abb1_p_home[0], self.abb1_p_home[1], self.abb1_p_home[2],
                                    self.abb1_p_home[3], self.abb1_p_home[4], self.abb1_p_home[5])
 
+        self.abb2ExecLinTrajectory(self.abb2_p_home[0], self.abb2_p_home[1], self.abb2_p_home[2],
+                                   self.abb2_p_home[3], self.abb2_p_home[4], self.abb2_p_home[5])
+
+        # Movimientos del brazo 1
         for i in range(0, len(self.abb1Trajectory)):
             self.abb1ExecLinTrajectory(self.abb1Trajectory[i][0], self.abb1Trajectory[i][1],
                                        self.abb1Trajectory[i][2], self.abb1Trajectory[i][3],
@@ -307,7 +316,7 @@ class TrabajoFinal(QObject):
                     lin_error_prev = lin_error
 
                 # El auto detecto un obtaculo en frente
-                for i in range(11, 15):
+                for i in range(10, 16):
                     if car_obs_sensor_value[i][1]:
                         if car_obs_sensor_value[i][0] < 0.15:
                             self.carSetVelocity(0.0, 0.0)
@@ -384,7 +393,17 @@ class TrabajoFinal(QObject):
         # Posicionamos las cajas como corresponde
         sim.simxSetInt32Signal(self.coppeliaIdClient, "box_teleport", 1, sim.simx_opmode_oneshot)
 
-        print("Accion brazo 2")
+        # Movimientos del brazo 2
+        for i in range(0, len(self.abb2Trajectory)):
+            self.abb2ExecLinTrajectory(self.abb2Trajectory[i][0], self.abb2Trajectory[i][1],
+                                       self.abb2Trajectory[i][2], self.abb2Trajectory[i][3],
+                                       self.abb2Trajectory[i][4], self.abb2Trajectory[i][5])
+
+            if (i == 0) or (i == 13) or (i == 28):
+                self.coppeliaABB2SetVacuumGripper(1)
+
+            if (i == 8) or (i == 22) or (i == 34):
+                self.coppeliaABB2SetVacuumGripper(0)
 
     def abb1ExecTrajectory(self, traj):
         for i in traj:
@@ -438,6 +457,66 @@ class TrabajoFinal(QObject):
                     _row.append(float(row[i]))
 
                 self.abb1Trajectory.append(_row)
+
+            file.close()
+
+            return True
+
+        else:
+            return False
+
+    def abb2ExecTrajectory(self, traj):
+        for i in traj:
+            self.coppeliaABB2SetJointsRotations(i[0], i[1], i[2], i[3], i[4], i[5])
+            self.abb2_q1, self.abb2_q2, self.abb2_q3, self.abb2_q4, self.abb2_q5, self.abb2_q6 = \
+                i[0], i[1], i[2], i[3], i[4], i[5]
+            time.sleep(0.01)
+
+    def abb2ExecPtpTrajectory(self, x, y, z, a, b, c):
+        traj = self.abb2Engine.ptpTrajectory(self.abb2_x, self.abb2_y, self.abb2_z,
+                                             self.abb2_a, self.abb2_b, self.abb2_c,
+                                             x, y, z, a, b, c,
+                                             100)
+
+        if traj:
+            self.abb2ExecTrajectory(traj)
+            self.abb2_x, self.abb2_y, self.abb2_z, self.abb2_a, self.abb2_b, self.abb2_c = x, y, z, a, b, c
+
+            return True
+
+        else:
+            return False
+
+    def abb2ExecLinTrajectory(self, x, y, z, a, b, c):
+        traj = self.abb2Engine.linTrajectory(self.abb2_x, self.abb2_y, self.abb2_z,
+                                             self.abb2_a, self.abb2_b, self.abb2_c,
+                                             x, y, z, a, b, c,
+                                             100)
+
+        if traj:
+            self.abb2ExecTrajectory(traj)
+            self.abb2_x, self.abb2_y, self.abb2_z, self.abb2_a, self.abb2_b, self.abb2_c = x, y, z, a, b, c
+
+            return True
+
+        else:
+            return False
+
+    def abb2LoadTrajectory(self):
+        file = open("trajs/ABB2.traj", "r")
+
+        if file:
+            a = list(csv.reader(file, delimiter=','))
+
+            self.abb2Trajectory.clear()
+
+            for row in a:
+                _row = []
+
+                for i in range(0, 6):
+                    _row.append(float(row[i]))
+
+                self.abb2Trajectory.append(_row)
 
             file.close()
 

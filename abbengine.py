@@ -321,7 +321,7 @@ class ABBEngine:
             [
                 np.sin(a) * np.sin(b) * np.cos(c) + np.cos(a) * np.sin(c),
                 -np.sin(a) * np.sin(b) * np.sin(c) + np.cos(a) * np.cos(c),
-                np.sin(a) * np.cos(b)
+                -np.sin(a) * np.cos(b)
             ],
             [
                 -np.cos(a) * np.sin(b) * np.cos(c) + np.sin(a) * np.sin(c),
