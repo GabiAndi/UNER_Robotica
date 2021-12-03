@@ -252,61 +252,152 @@ class TrabajoFinal(QObject):
         # Autito
         car_complete = False
 
+        # Seguidor de linea
         # Ponderacion
-        pond = [2.0, 1.0, 0.5, 0.3, 0.3, 0.5, 1.0, 2.0]
+        lin_pond = [2.0, 1.0, 0.5, 0.3, 0.3, 0.5, 1.0, 2.0]
 
-        kp = 2.5
-        kd = 2.5
+        lin_kp = 2.5
+        lin_kd = 2.5
 
-        error_prev = 0.0
+        lin_error_prev = 0.0
+
+        # Esquive de obstaculos
+        box_pond = 2.0
+
+        box_kp = 1.0
+        box_kd = 2.0
+
+        box_error_prev = 0.0
+
+        # Maquina de estados para la solución del problema
+        car_state = 0
 
         while not car_complete:
             # Leemos los valores del ultrasonico
-            obstruction = False
-
             car_obs_sensor_value = self.carReadObsSensors()
 
-            if car_obs_sensor_value:
-                self.sceneCarObsSensorChanged.emit(car_obs_sensor_value)
+            # Enviamos los valores
+            send_obs_val = []
 
-            for i in range(10, 16):
-                if car_obs_sensor_value[i] < 0.1:
-                    obstruction = True
+            for i in car_obs_sensor_value:
+                send_obs_val.append(i[0])
 
-            if obstruction:
-                self.carSetVelocity(0.0, 0.0)
+            self.sceneCarObsSensorChanged.emit(send_obs_val)
 
-                """direction = 0.0
+            # Leemos el valor de los sensores de vision
+            car_sensor_value = self.carReadSensors()
 
-                obs_pond = [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+            if car_sensor_value:
+                self.sceneCarSensorChanged.emit(car_sensor_value)
 
-                for i in range(10, 16):
-                    direction += 0.0"""
-
-            else:
-                # Leemos el valor de los sensores
-                car_sensor_value = self.carReadSensors()
-
-                if car_sensor_value:
-                    self.sceneCarSensorChanged.emit(car_sensor_value)
-
+            # Maquina de estados
+            # El auto esta siguiendo la linea
+            if car_state == 0:
                 if car_sensor_value:
                     # PID
-                    error = 0.0
+                    lin_error = 0.0
 
-                    error += car_sensor_value[0] * pond[0] - car_sensor_value[7] * pond[7]
-                    error += car_sensor_value[1] * pond[1] - car_sensor_value[6] * pond[6]
-                    error += car_sensor_value[2] * pond[2] - car_sensor_value[5] * pond[5]
-                    error += car_sensor_value[3] * pond[3] - car_sensor_value[4] * pond[4]
+                    lin_error += car_sensor_value[0] * lin_pond[0] - car_sensor_value[7] * lin_pond[7]
+                    lin_error += car_sensor_value[1] * lin_pond[1] - car_sensor_value[6] * lin_pond[6]
+                    lin_error += car_sensor_value[2] * lin_pond[2] - car_sensor_value[5] * lin_pond[5]
+                    lin_error += car_sensor_value[3] * lin_pond[3] - car_sensor_value[4] * lin_pond[4]
 
-                    error /= 8
+                    lin_error /= 8
 
-                    correction = error * kp + error_prev * kd
+                    lin_correction = lin_error * lin_kp + lin_error_prev * lin_kd
 
-                    self.carSetVelocity(-0.5, -correction)
+                    self.carSetVelocity(-0.5, -lin_correction)
 
                     # Valores del PID
-                    error_prev = error
+                    lin_error_prev = lin_error
+
+                # El auto detecto un obtaculo en frente
+                for i in range(11, 15):
+                    if car_obs_sensor_value[i][1]:
+                        if car_obs_sensor_value[i][0] < 0.1:
+                            self.carSetVelocity(0.0, 0.0)
+
+                            car_state = 1
+
+            # El auto tiene que analizar hacia que lado evitara el obstaculo
+            elif car_state == 1:
+                direction_pond = [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0]
+
+                # Direccion
+                direction = 0.0
+
+                direction += car_obs_sensor_value[10][0] * direction_pond[0] + \
+                             car_obs_sensor_value[15][0] * direction_pond[5]
+                direction += car_obs_sensor_value[11][0] * direction_pond[1] + \
+                             car_obs_sensor_value[14][0] * direction_pond[4]
+                direction += car_obs_sensor_value[12][0] * direction_pond[2] + \
+                             car_obs_sensor_value[13][0] * direction_pond[3]
+
+                # El auto deberia esquivar por la izquierda
+                if direction < 0.0:
+                    car_state = 10
+
+                else:
+                    car_state = 20
+
+            # Esquivando el auto por la izquierda
+            elif car_state == 10:
+                self.carSetVelocity(0.0, 0.5)
+                time.sleep(5.0)
+
+                car_state = 11
+
+            elif car_state == 11:
+                # PID
+                box_error = 0.0
+
+                box_error += car_obs_sensor_value[0][0] * box_pond - 0.25
+
+                box_error /= 3
+
+                box_correction = box_error * box_kp + box_error_prev * box_kd
+
+                self.carSetVelocity(-0.5, -box_correction)
+
+                # Valores del PID
+                box_error_prev = box_error
+
+                # Medicion de la linea
+                for i in range(0, 8):
+                    if car_sensor_value[i] < 0.2:
+                        car_state = 0
+
+            # Esquivando el auto por la derecha
+            elif car_state == 20:
+                self.carSetVelocity(0.0, -0.5)
+                time.sleep(5.0)
+
+                car_state = 21
+
+            elif car_state == 21:
+                # PID
+                box_error = 0.0
+
+                box_error += car_obs_sensor_value[7][0] * box_pond - 0.25
+
+                box_error /= 3
+
+                box_correction = box_error * box_kp + box_error_prev * box_kd
+
+                self.carSetVelocity(-0.5, box_correction)
+
+                # Valores del PID
+                box_error_prev = box_error
+
+                # Medicion de la linea
+                for i in range(0, 8):
+                    if car_sensor_value[i] < 0.2:
+                        car_state = 0
+
+            elif car_state == 100:
+                self.carSetVelocity(0.0, 0.0)
+
+                car_complete = True
 
             time.sleep(0.1)
 
@@ -378,14 +469,13 @@ class TrabajoFinal(QObject):
             ret_code, res, value = sim.simxReadVisionSensor(self.coppeliaIdClient,
                                                             self.carSensor[i],
                                                             sim.simx_opmode_streaming)
-
             if value:
                 _val = np.mean(value[0])
 
                 values.append(_val)
 
             else:
-                return []
+                values.append(0.0)
 
         return values
 
@@ -398,13 +488,12 @@ class TrabajoFinal(QObject):
                 self.coppeliaIdClient, self.carObsSensor[i], sim.simx_opmode_oneshot
             )
 
-            if ret:
-                val = np.sqrt(np.power(ret[2][0], 2) + np.power(ret[2][1], 2) + np.power(ret[2][2], 2))
+            val = np.sqrt(np.power(ret[2][0], 2) + np.power(ret[2][1], 2) + np.power(ret[2][2], 2))
 
-                if val > 1.0:
-                    val = 1.0
+            if val > 1.0:
+                val = 1.0
 
-                values.append(val)
+            values.append([val, ret[1]])
 
         return values
 
