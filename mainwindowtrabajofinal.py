@@ -117,7 +117,7 @@ class TrabajoFinal(QObject):
 
         # Posiciones de interes
         self.abb1_p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
-        self.abb2_p_home = [200.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.abb1_p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores iniciales
         self.coppeliaIdClient = -1
@@ -262,12 +262,7 @@ class TrabajoFinal(QObject):
         lin_error_prev = 0.0
 
         # Esquive de obstaculos
-        box_pond = 2.0
-
-        box_kp = 1.0
-        box_kd = 2.0
-
-        box_error_prev = 0.0
+        box_kp = 2.5
 
         # Maquina de estados para la solución del problema
         car_state = 0
@@ -314,7 +309,7 @@ class TrabajoFinal(QObject):
                 # El auto detecto un obtaculo en frente
                 for i in range(11, 15):
                     if car_obs_sensor_value[i][1]:
-                        if car_obs_sensor_value[i][0] < 0.1:
+                        if car_obs_sensor_value[i][0] < 0.15:
                             self.carSetVelocity(0.0, 0.0)
 
                             car_state = 1
@@ -340,7 +335,7 @@ class TrabajoFinal(QObject):
                 else:
                     car_state = 20
 
-            # Esquivando el auto por la izquierda
+            # Esquivando el auto por la derecha
             elif car_state == 10:
                 self.carSetVelocity(0.0, 0.5)
                 time.sleep(5.0)
@@ -348,26 +343,17 @@ class TrabajoFinal(QObject):
                 car_state = 11
 
             elif car_state == 11:
-                # PID
-                box_error = 0.0
-
-                box_error += car_obs_sensor_value[0][0] * box_pond - 0.25
-
-                box_error /= 3
-
-                box_correction = box_error * box_kp + box_error_prev * box_kd
-
-                self.carSetVelocity(-0.5, -box_correction)
-
-                # Valores del PID
-                box_error_prev = box_error
+                # P
+                box_error = 0.125 - car_obs_sensor_value[7][0]
+                box_correction = box_error * box_kp
+                self.carSetVelocity(-0.5, box_correction)
 
                 # Medicion de la linea
                 for i in range(0, 8):
                     if car_sensor_value[i] < 0.2:
                         car_state = 0
 
-            # Esquivando el auto por la derecha
+            # Esquivando el auto por la izquierda
             elif car_state == 20:
                 self.carSetVelocity(0.0, -0.5)
                 time.sleep(5.0)
@@ -375,31 +361,30 @@ class TrabajoFinal(QObject):
                 car_state = 21
 
             elif car_state == 21:
-                # PID
-                box_error = 0.0
-
-                box_error += car_obs_sensor_value[7][0] * box_pond - 0.25
-
-                box_error /= 3
-
-                box_correction = box_error * box_kp + box_error_prev * box_kd
-
-                self.carSetVelocity(-0.5, box_correction)
-
-                # Valores del PID
-                box_error_prev = box_error
+                # P
+                box_error = 0.125 - car_obs_sensor_value[7][0]
+                box_correction = box_error * box_kp
+                self.carSetVelocity(-0.5, -box_correction)
 
                 # Medicion de la linea
                 for i in range(0, 8):
                     if car_sensor_value[i] < 0.2:
                         car_state = 0
 
-            elif car_state == 100:
-                self.carSetVelocity(0.0, 0.0)
+            car_sim = sim.simxGetInt32Signal(self.coppeliaIdClient, "car_finished", sim.simx_opmode_oneshot)
 
-                car_complete = True
+            if car_sim[0] == sim.simx_return_ok:
+                if car_sim[1] == 1:
+                    self.carSetVelocity(0.0, 0.0)
+                    car_complete = True
 
             time.sleep(0.1)
+
+        # Brazo 2
+        # Posicionamos las cajas como corresponde
+        sim.simxSetInt32Signal(self.coppeliaIdClient, "box_teleport", 1, sim.simx_opmode_oneshot)
+
+        print("Accion brazo 2")
 
     def abb1ExecTrajectory(self, traj):
         for i in traj:

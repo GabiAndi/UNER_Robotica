@@ -36,7 +36,7 @@ class MainWindowABBPanel(QMainWindow):
         )
 
         # Posiciones de interes
-        self.p_home = [200.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
+        self.p_home = [374.0 + 67.0, 0.0, 630.0, np.pi, np.pi / 2.0, 0.0]
 
         # Valores actuales del robot
         self.q1 = 0.0
@@ -459,7 +459,7 @@ class MainWindowABBPanel(QMainWindow):
     def pushButtonABBCapturarPunto_onClicked(self):
         self.trajectory.append([self.x, self.y, self.z, self.a, self.b, self.c])
 
-        self.trajectoryIndex = len(self.trajectory)
+        self.trajectoryIndex = len(self.trajectory) - 1
 
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
@@ -475,7 +475,7 @@ class MainWindowABBPanel(QMainWindow):
         self.ui.labelABBCantidadPuntos.setText(str(len(self.trajectory)))
 
     def pushButtonABBAnteriorTrayectoria_onClicked(self):
-        if self.trajectoryIndex - 1 >= 0:
+        if self.trajectoryIndex > 0:
             self.trajectoryIndex -= 1
 
             if self.execLinTrajectory(self.trajectory[self.trajectoryIndex][0],
@@ -491,6 +491,10 @@ class MainWindowABBPanel(QMainWindow):
             else:
                 QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
                             QMessageBox.Ok, self).open()
+
+        else:
+            QMessageBox(QMessageBox.Warning, "Trayectoria", "No hay punto anterior",
+                        QMessageBox.Ok, self).open()
 
     def pushButtonABBSiguienteTrayectoria_onClicked(self):
         if self.trajectoryIndex + 1 < len(self.trajectory):
@@ -509,6 +513,10 @@ class MainWindowABBPanel(QMainWindow):
             else:
                 QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
                             QMessageBox.Ok, self).open()
+
+        else:
+            QMessageBox(QMessageBox.Warning, "Trayectoria", "No hay punto siguiente",
+                        QMessageBox.Ok, self).open()
 
     def pushButtonABBEjecutarTrayectoria_onClicked(self):
         if len(self.trajectory) > 0:
@@ -531,22 +539,27 @@ class MainWindowABBPanel(QMainWindow):
             ]
 
             for i in range(0, len(self.trajectory) - 1):
-                trajs.append(self.abbengine.linTrajectory(self.trajectory[i][0], self.trajectory[i][1],
-                                                          self.trajectory[i][2], self.trajectory[i][3],
-                                                          self.trajectory[i][4], self.trajectory[i][5],
-                                                          self.trajectory[i + 1][0], self.trajectory[i + 1][1],
-                                                          self.trajectory[i + 1][2], self.trajectory[i + 1][3],
-                                                          self.trajectory[i + 1][4], self.trajectory[i + 1][5],
-                                                          100))
+                _traj = self.abbengine.linTrajectory(self.trajectory[i][0], self.trajectory[i][1],
+                                                     self.trajectory[i][2], self.trajectory[i][3],
+                                                     self.trajectory[i][4], self.trajectory[i][5],
+                                                     self.trajectory[i + 1][0], self.trajectory[i + 1][1],
+                                                     self.trajectory[i + 1][2], self.trajectory[i + 1][3],
+                                                     self.trajectory[i + 1][4], self.trajectory[i + 1][5],
+                                                     100)
 
-            for i in trajs:
-                if self.execTrajectory(i):
-                    [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[len(self.trajectory) - 1]
-                    self.valueChanged()
+                if _traj:
+                    trajs.append(_traj)
 
                 else:
                     QMessageBox(QMessageBox.Critical, "Trayectoria", "Error de trayectoria",
                                 QMessageBox.Ok, self).open()
+
+                    return
+
+            for i in trajs:
+                self.execTrajectory(i)
+                [self.x, self.y, self.z, self.a, self.b, self.c] = self.trajectory[len(self.trajectory) - 1]
+                self.valueChanged()
 
             QMessageBox(QMessageBox.Information, "Trayectoria", "Ejecutada correctamente",
                         QMessageBox.Ok, self).open()
