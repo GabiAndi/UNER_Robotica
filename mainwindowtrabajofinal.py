@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QMainWindow, QMessageBox
-from PySide2.QtCore import Signal, QObject, QThread
+from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtCore import Signal, QObject, QThread
 
 from ui_mainwindowtrabajofinal import Ui_MainWindowTrabajoFinal
 
@@ -64,20 +64,20 @@ class MainWindowTrabajoFinal(QMainWindow):
 
     def sceneStarted(self):
         QMessageBox(QMessageBox.Information, "Escena", "La escena se inicio correctamente",
-                    QMessageBox.Ok, self).exec_()
+                    QMessageBox.Ok, self).exec()
 
     def sceneError(self, error):
         if error == 0:
             QMessageBox(QMessageBox.Critical, "Escena", "Error de conexión",
-                        QMessageBox.Ok, self).exec_()
+                        QMessageBox.Ok, self).exec()
 
         elif error == 1:
             QMessageBox(QMessageBox.Critical, "Escena", "Error de configuracion",
-                        QMessageBox.Ok, self).exec_()
+                        QMessageBox.Ok, self).exec()
 
     def sceneStoped(self):
         QMessageBox(QMessageBox.Warning, "Escena", "La escena se detuvo correctamente",
-                    QMessageBox.Ok, self).exec_()
+                    QMessageBox.Ok, self).exec()
 
     def sceneCarSensorChanged(self, values):
         self.ui.labelCarSensor0.setText(str("%.4f" % values[0]))
@@ -271,7 +271,7 @@ class TrabajoFinal(QObject):
         lin_error_prev = 0.0
 
         # Esquive de obstaculos
-        box_kp = 2.5
+        box_kp = 2.0
 
         # Maquina de estados para la solución del problema
         car_state = 0

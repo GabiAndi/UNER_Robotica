@@ -24,7 +24,8 @@
   </property>
   <property name="font">
    <font>
-    <family>Nimbus Sans</family>
+    <family>Nimbus Sans L</family>
+    <pointsize>11</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -51,7 +52,6 @@
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
-          <family>Nimbus Sans</family>
           <pointsize>24</pointsize>
          </font>
         </property>

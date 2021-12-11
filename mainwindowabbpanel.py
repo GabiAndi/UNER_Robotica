@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog, QLineEdit
-from PySide2.QtCore import Signal
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog, QLineEdit
+from PySide6.QtCore import Signal
 
 from ui_mainwindowabbpanel import Ui_MainWindowABBPanel
 

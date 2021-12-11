@@ -18,7 +18,7 @@
   </property>
   <property name="font">
    <font>
-    <family>Nimbus Sans</family>
+    <pointsize>11</pointsize>
    </font>
   </property>
   <property name="windowTitle">

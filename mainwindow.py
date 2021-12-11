@@ -1,7 +1,8 @@
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMainWindow
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMainWindow
 
 from ui_mainwindow import Ui_MainWindow
+
 from mainwindowabbpanel import MainWindowABBPanel
 from mainwindowtrabajofinal import MainWindowTrabajoFinal
 

@@ -116,15 +116,15 @@ class ABBEngine:
         m0 = m1 @ m2 @ m3 @ m4 @ m5 @ m6 @ self.tool
 
         # Posicion
-        x = m0[0, 3]
-        y = m0[1, 3]
-        z = m0[2, 3]
+        x = m0[0][3]
+        y = m0[1][3]
+        z = m0[2][3]
 
         # Orientacion
         orientation = np.array([
-            [m0[0, 0], m0[0, 1], m0[0, 2]],
-            [m0[1, 0], m0[1, 1], m0[1, 2]],
-            [m0[2, 0], m0[2, 1], m0[2, 2]]
+            [m0[0][0], m0[0][1], m0[0][2]],
+            [m0[1][0], m0[1][1], m0[1][2]],
+            [m0[2][0], m0[2][1], m0[2][2]]
         ])
 
         [a, b, c] = self.inverseEuler(orientation)

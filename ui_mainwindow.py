@@ -3,15 +3,22 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
+    QMainWindow, QPushButton, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -21,7 +28,8 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QSize(300, 180))
         MainWindow.setMaximumSize(QSize(300, 180))
         font = QFont()
-        font.setFamily(u"Nimbus Sans")
+        font.setFamilies([u"Nimbus Sans L"])
+        font.setPointSize(11)
         MainWindow.setFont(font)
         self.actionAcerca_de = QAction(MainWindow)
         self.actionAcerca_de.setObjectName(u"actionAcerca_de")
@@ -40,7 +48,6 @@ class Ui_MainWindow(object):
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         font1 = QFont()
-        font1.setFamily(u"Nimbus Sans")
         font1.setPointSize(24)
         self.label.setFont(font1)
         self.label.setAlignment(Qt.AlignCenter)
